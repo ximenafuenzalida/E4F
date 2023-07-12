@@ -7,7 +7,7 @@ output:
 ---
 
 
-```{r}
+```{r} 
 library(rio)
 
 d1 = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSxZIpRqxr3-WT10cyRRtqxbZW0d_KRfC7ch6OPJNM_S4WzaNuKT4J2ONq67WjfiLQWIFBroxjAwZGY/pub?output=csv"
@@ -50,18 +50,18 @@ Para el proceso de creacion de base de datos, en orimer lugar, se recopilaros la
 
 # Regresiones
 
-```{r}
+```{r, echo=FALSE,results = FALSE} 
 modelo1 <- lm(v2x_clphy ~ fdi + v2xps_party + v2xpe_exlgeo, data = data)
 summary(modelo1)
 ```
 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 reg1=lm(modelo1,data=data)
 summary(reg1)
 ```
 
-```{r}
+```{r, echo=FALSE}
 library(knitr)
 library(modelsummary)
 reg1=lm(modelo1,data=data)
@@ -89,28 +89,28 @@ Realizamos esta técnica porque no contamos con una teoría previa contundente. 
 
 ### Arreglamos algunos nombres de la data
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 colnames(data)[1:7] <- c("pais", "represion", "regimen", "civilizacion", "occidentalizacion", "corrupcion", "paz")
 ```
 
 ## 1. subseteamos: 
 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 str(data$regimen)
 str(data$civilizacion)
 str(data$nivel_ingresos)
 ```
 
 excluimos las que no pueden entrar en el análisis. 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 dontselect=c("pais","civilizacion","regimen","nivel_ingresos","fdi") #o sea le digo las columnas que no quiero que seleccione
 select=setdiff(names(data),dontselect) 
 theData=data[,select] #crea una nueva data sin esas columnas
 ```
 
 omitimos los casos perdidos (aqui perdemos mucha data porque algunas varaibles tienen muchos NAs)
-```{r}
+```{r, echo=FALSE,results = FALSE}
 theData <- na.omit(theData)
 ```
 
@@ -119,7 +119,7 @@ theData <- na.omit(theData)
 ## 2. Calculamos la matriz de correlación
 
 antes nos vamos a asegurar que las variables sean leidas con el tipo numérico.
-```{r}
+```{r, echo=FALSE}
 str(theData$represion)
 str(theData$occidentalizacion)
 str(theData$corrupcion)
@@ -135,13 +135,13 @@ str(theData$idh)
 ```
 
 convertimos las que no.
-```{r}
+```{r, echo=FALSE}
 theData$corrupcion <- as.numeric(theData$corrupcion)
 theData$Tasa_pobreza<- as.numeric(theData$Tasa_pobreza)
 ```
 
 confirmamos:
-```{r}
+```{r, echo=FALSE}
 str(theData$corrupcion)
 str(theData$Tasa_pobreza)
 str(theData$libertad_prensa)
@@ -158,7 +158,7 @@ corMatrix=polycor::hetcor(theData)$correlations #se hace con esa nueva data "the
 
 La Figura muestra las correlaciones entre todas las variables a utilizar:
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 library(ggcorrplot)
 
 ggcorrplot(corMatrix) #usamos el objeto llamado corMatrix
@@ -168,7 +168,7 @@ El gráfico ya nos advierte que puede que  se ha encontrado una posible correlac
 
 ## 4. Verificamos si los datos permiten factorizar con KMO: 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 library(psych)
 psych::KMO(corMatrix) #seguimos usando el objeto corMatrix
 ```
@@ -179,7 +179,7 @@ Observamos que salvo FDI, Tasa_pobreza y libertad_prensa, los valores que ofrece
 
 Hnula, La matriz de correlacion es una matriz identidad:
 
-```{r}
+```{r, echo=FALSE}
 cortest.bartlett(corMatrix,n=nrow(theData))$p.value>0.05
 ```
 Esto significa que no se trata de una matriz donde las variables solo están relacionadas consigo mismas
@@ -188,7 +188,7 @@ Esto significa que no se trata de una matriz donde las variables solo están rel
 
 Hnula: La matriz de correlacion es una matriz singular,
 
-```{r}
+```{r, echo=FALSE}
 library(matrixcalc)
 
 is.singular.matrix(corMatrix)
@@ -200,7 +200,7 @@ Ambas pruebas señalan que puede continuarse con el análisis.
 
 ## 6. Determinamos en cuantos factores o variables latentes podríamos redimensionar la data: En este caso, la función fa.parallel nos dará la sugerencia:
 
-```{r}
+```{r, echo=FALSE}
 fa.parallel(theData, fa = 'fa',correct = T,plot = F)
 ```
 
@@ -211,7 +211,7 @@ Resultado inicial:
 
 para ello creamos un objeto llamado "resfa": 
 
-```{r}
+```{r, echo=FALSE}
 library(GPArotation) 
 resfa <- fa(theData, #aparece un objeto llamado resfa
             nfactors = 1, #ponemos el numero de factores que nos dio
@@ -226,7 +226,7 @@ En esta tabla no se nos dice cuánta información se ha podido recuperar, solo h
 Es la unica tabla que podemos pedir. 
 
 graficamos 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 fa.diagram(resfa,main = "Resultados del EFA")
 ```
 
@@ -238,33 +238,33 @@ El análisis solo puede llegar hasta aqui, se han agrupado algunas variables en 
 el anterior análisis no aportó mucho a nuestra exploración de los datos. si bien antes trabajamos con variables, ahora trabajaremos con los casos. 
 
 
-```{r}
+```{r, echo=FALSE}
 dontselect=c("civilizacion","regimen") #o sea le digo las columnas que no quiero que seleccione
 select=setdiff(names(data),dontselect) 
 DinaAsesina=data[,select] #crea una nueva data sin esas columnas
 ```
 
-```{r}
+```{r, echo=FALSE}
 DinaAsesina <- na.omit(DinaAsesina)
 ```
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 str(data$nivel_ingresos)
 ```
 
 Vamos a recodificar esta variable para que pueda leerse como numérica: 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 recodificacion <- c("Low income" = 1, "Lower middle income" = 2, "Upper middle income" = 3, "High income" = 4)
 DinaAsesina$nivel_ingresos <- recodificacion[DinaAsesina$nivel_ingresos]
 ```
 listo 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 str(DinaAsesina$nivel_ingresos)
 ```
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 DinaAsesina$corrupcion <- as.numeric(DinaAsesina$corrupcion)
 ```
 
@@ -276,44 +276,44 @@ DinaAsesina$libertad_prensa<- as.numeric(DinaAsesina$libertad_prensa)
 
 
 
-```{r}
+```{r, echo=FALSE}
 boxplot(DinaAsesina[,c(2,3,4,5,7,8,9,10,11,12,13)],horizontal = F,las=2,cex.axis = 0.5)
 ```
 
 cambiamos el rango para poder leer
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 library(BBmisc)
 boxplot(normalize(DinaAsesina[,c(2,4,5,7,8,9,10,11,12,13)],method='range',range=c(0,10)))
 ```
 
 tipificamos: 
 
-```{r}
+```{r, echo=FALSE}
 boxplot(normalize(DinaAsesina[,c(2,4,5,7,8,9,10,11,12,13)],method='standardize'))
 ```
 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 DinaAsesina[,c(2,4,5,7,8,9,10,11,12,13)]=normalize(DinaAsesina[,c(2,4,5,7,8,9,10,11,12,13)],method='standardize')
 ```
 
 
 correlacion: 
 
-```{r}
+```{r, echo=FALSE}
 cor(DinaAsesina[,c(2,4,5,7,8,9,10,11,12,13)])
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 dataClus=DinaAsesina[,c(2,4,5,7,8,9,10,11,12,13)]
 row.names(dataClus)=DinaAsesina$pais
 ```
 
 calculo de matriz de distancias: 
 
-```{r}
+```{r, echo=FALSE,}
 library(cluster)
 g.dist = daisy(dataClus, metric="gower")
 ```
@@ -321,7 +321,7 @@ g.dist = daisy(dataClus, metric="gower")
 
 Estrategia de particion: 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 ## para PAM
 
 library(factoextra)
@@ -330,11 +330,11 @@ fviz_nbclust(dataClus, pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = 
 
 Nos dice que el número óptimo de clusters es 2. Es decir, los países pueden agruparse, según la información que hemos proporcionado al análisis, en dos grandes grupos. 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 library(magrittr)
 ```
 
-```{r}
+```{r, echo=FALSE}
 library(kableExtra)
 set.seed(123)
 res.pam=pam(g.dist,2,cluster.only = F)
@@ -348,12 +348,12 @@ head(dataClus,15)%>%kbl()%>%kable_styling()
 
 Con las siluetas podemso percatarnos de la cantidad de países mal clausetrizados, en general las barras no son tan altas y esto nos hace dudar de la clausterización en alguna medida.  
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 fviz_silhouette(res.pam,print.summary = F)
 ```
 
 podemos cuales son estos 6 países. 
-```{r}
+```{r, echo=FALSE}
 silPAM=data.frame(res.pam$silinfo$widths)
 silPAM$country=row.names(silPAM)
 poorPAM=silPAM[silPAM$sil_width<0,'country']%>%sort()
@@ -361,11 +361,11 @@ poorPAM
 ```
 
 
-```{r}
+```{r, echo=FALSE,results = FALSE}
 aggregate(.~ pam, data=dataClus,mean)
 ```
 
-```{r}
+```{r, echo=FALSE,}
 DinaAsesina$pamIDHpoor=DinaAsesina$pais%in%poorPAM
 DinaAsesina$pamIDH=as.ordered(dataClus$pam)
 dataClus$pam=NULL
@@ -373,13 +373,13 @@ dataClus$pam=NULL
 
 
 
-```{r}
+```{r, echo=FALSE}
 # k es la cantidad de dimensiones
 proyeccion = cmdscale(g.dist, k=2,add = T) 
 head(proyeccion$points,20)
 ```
 
-```{r}
+```{r, echo=FALSE}
 # data frame prep:
 DinaAsesina$dim1 <- proyeccion$points[,1]
 DinaAsesina$dim2 <- proyeccion$points[,2]
@@ -387,14 +387,14 @@ DinaAsesina$dim2 <- proyeccion$points[,2]
 
 
 finalmente podemos graficar. 
-```{r}
+```{r, echo=FALSE}
 library(ggrepel)
 base= ggplot(DinaAsesina,aes(x=dim1, y=dim2,label=row.names(dataClus))) 
 base + geom_text_repel(size=3, max.overlaps = 50,min.segment.length = unit(0, 'lines'))
 ```
 
 
-```{r}
+```{r, echo=FALSE}
 # solo paises mal clusterizados
 PAMlabels=ifelse(DinaAsesina$pamIDHpoor,DinaAsesina$pais,'')
 
@@ -413,12 +413,12 @@ pamPlot + geom_text_repel(size=4,
 ```
 
 clusterizacion de tipo jerarquico
-```{r}
+```{r, echo=FALSE}
 fviz_nbclust(dataClus, hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F,hc_func = "agnes")
 ```
 
 se ve que se recomienda 2 clusteres mediante la tecnica AGNES
-```{r}
+```{r, echo=FALSE}
 set.seed(123)
 library(factoextra)
 
@@ -432,24 +432,24 @@ head(dataClus,15)%>%kbl()%>%kable_styling()
 ```
 
 Visualizamos de mejor
-```{r}
+```{r, echo=FALSE}
 # Visualize
 fviz_dend(res.agnes, cex = 0.7, horiz = T,main = "")
 ```
 evaluamos el uso de agnes
 
-```{r}
+```{r, echo=FALSE}
 fviz_silhouette(res.agnes,print.summary = F)
 ```
 
 evaluamos los datos (en este caso paises) que estan mal clusterizados
-```{r}
+```{r, echo=FALSE}
 silAGNES=data.frame(res.agnes$silinfo$widths)
 silAGNES$country=row.names(silAGNES)
 poorAGNES=silAGNES[silAGNES$sil_width<0,'country']%>%sort()
 poorAGNES
 ```
 Exploremos el promedio de cada cluster:
-```{r}
+```{r, echo=FALSE}
 aggregate(.~ agnes, data=dataClus,mean)
 ```
